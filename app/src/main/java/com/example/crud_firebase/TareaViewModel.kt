@@ -49,5 +49,25 @@ class TareaViewModel: ViewModel() {
         }
     }
 
+    fun actualizarTarea(tarea: Tarea){
+        viewModelScope.launch(Dispatchers.IO){
+            try {
+                db.collection("Tareas").document(tarea.id).update(tarea.toMap()).await()
+                _listaTareas.postValue(_listaTareas.value?.map {if(it.id == tarea.id) tarea else it})
+            }catch (e: Exception){
+                e.printStackTrace()
+            }
+        }
+    }
 
+    fun borrarTarea(id: String){
+        viewModelScope.launch(Dispatchers.IO){
+            try {
+                db.collection("tareas").document(id).delete().await()
+                _listaTareas.postValue(_listaTareas.value?.filter { it.id != id })
+            }catch (e:Exception){
+                e.printStackTrace()
+            }
+        }
+    }
 }
